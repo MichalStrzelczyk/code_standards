@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Foo\Bar\Name;
 
-use \Domain\Factory;
-use \Domain\Repository;
-use \Domain\Value\Image;
+use Domain\Factory;
+use Domain\Repository;
+use Domain\Value\Image;
 
 /**
  * Class MyClass
@@ -13,7 +13,6 @@ use \Domain\Value\Image;
  * This is class description
  */
 class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterface {
-
     use PriceTrait;
     use TransformTrait;
 
@@ -41,7 +40,7 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
      *
      * @param null $type
      */
-    public function __construct($type = null){
+    public function __construct($type = null) {
         $this->repository = $this->setRepository(Factory::create('\Domain\Repository'));
         $this->image = Factory::create('\Domain\Value\Image');
         $this->type = $type;
@@ -53,7 +52,6 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
      * @return Repository
      */
     public function getRepository(): Repository {
-
         return $this->repository;
     }
 
@@ -85,12 +83,11 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
      * @return bool
      */
     public function execute(string $foo, string $bar, int $amount): bool {
-
         // More than two keys.
         $options = [
             'foo' => $foo,
             'bar' => $bar,
-            'amount' => $amount
+            'amount' => $amount,
         ];
         $result = $this->getRepository()->checkSomething($options);
 
@@ -124,24 +121,23 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
         string $status,
         int $amount
     ): bool {
-
         // This is simple comment.
         if ($config->hasParameter('foo') === $foo) {
-
             return $status;
         }
 
         switch ($type) {
             case 'basic':
             case 'default':
-                $name = \Tools::generateCorrectName($bar); break;
+                $name = \Tools::generateCorrectName($bar);
+                break;
             default:
                 $name = \Tools::generateCorrectName($name);
         }
 
-        try{
+        try {
             $result = $this->repository->countSomething($name, $type);
-        }catch(\Domain\Repository\Exception\Count $e){
+        } catch (\Domain\Repository\Exception\Count $e) {
             $this->logger->info('Repo can\'t count something important', ['name' => $name, 'type' => $type]);
             $result = 0;
         }
@@ -178,13 +174,13 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
      *
      * @return array
      */
-    public function loopSomething(int $limit = null){
+    public function loopSomething(int $limit = null) {
         if ($limit === null) {
             $limit = $this->getRepository()->countLimit();
         }
 
         $result = [];
-        for ($i=0; $i<$limit; $i++) {
+        for ($i = 0; $i < $limit; $i++) {
             $result[$i] = $this->getRepository()->doSomething($i);
         }
 
@@ -221,5 +217,4 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
 
         return parent::callSomething($options);
     }
-
 }
