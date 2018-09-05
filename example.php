@@ -3,96 +3,183 @@ declare(strict_types=1);
 
 namespace Foo\Bar\Name;
 
-use \Domain\Factory;
-use \Domain\Repository;
-use \Domain\Value\Image;
-
 /**
  * Class MyClass
  *
  * This is class description
  */
-class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterface {
+class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
+    \Foo\Bar\Name\AdapterInterface,
+    \Foo\Bar\Name\PriceInterface,
+    \Foo\Bar\Name\MemoryInterface,
+    \Foo\Bar\Name\ABCInterface {
 
-    use PriceTrait;
-    use TransformTrait;
+    // Traits:
 
-    const STATUS_ACCEPTED = 'accepted';
-    const STATUS_FAILED = 'failed';
-    const TYPE = 'internal';
+    use \Foo\Bar\Name\PriceTrait;
+    use \Foo\Bar\Name\TransformTrait;
+
+    // Constants:
+
+    public const STATUS_ACCEPTED = 'accepted';
+    protected const STATUS_FAILED = 'failed';
+    private const TYPE = 'internal';
+
+
+    // Static properties:
+
+    public static $countries = [
+        'pl' => 'Poland',
+        'dk' => 'Denmark'
+    ];
+
+    protected static $helpers = [
+        \Foo\Bar\Name\Helper\HelperA::class,
+        \Foo\Bar\Name\Helper\HelperB::class,
+        \Foo\Bar\Name\Helper\HelperC::class,
+    ];
+
+    private static $strategies = ['First', 'Second'];
+
+    // Properties:
 
     /**
-     * @var Repository
+     * @var string|null
+     */
+    public $type;
+
+    /**
+     * @var string|null
+     */
+    public $name;
+
+    /**
+     * @var \Foo\Bar\Domain\Repository
      */
     protected $repository;
 
     /**
-     * @var Image
+     * @var \Foo\Bar\Domain\Value\Image
      */
     private $image;
 
+    // Abstract static methods:
+
     /**
-     * @var string
+     * Return class version
+     *
+     * @see \Foo\Bar\Name\AbstractAdapter
+     *
+     * @return string
      */
-    public $type = null;
+    public static function getVersion(): string {
+        return '0.0.1';
+    }
+
+    // Abstract methods:
+
+    /**
+     * Return Adapter
+     *
+     * @see \Foo\Bar\Name\AbstractAdapter
+     *
+     * @return \Foo\Bar\Name\Adapter\BasicInterface
+     */
+    public function getAdapter(): \Foo\Bar\Name\Adapter\BasicInterface {
+        if (!is_null($this->adapter)) {
+            return $this->adapter;
+        }
+
+        $this->adapter = \Foo\Bar\Name\AdapterFactory::create('\Adapter\\'.$this->getType());
+
+        return $this->adapter;
+    }
+
+
+    // Magic methods:
 
     /**
      * MyClass constructor.
      *
      * @param null $type
      */
-    public function __construct($type = null){
-        $this->repository = $this->setRepository(Factory::create('\Domain\Repository'));
-        $this->image = Factory::create('\Domain\Value\Image');
+    public function __construct($type = null) {
+        $this->repository = $this->setRepository(\Foo\Bar\Name\RepositoryFactory::create('\Domain\Repository'));
+        $this->image = \Foo\Bar\Name\ValueFactory::create('\Domain\Value\Image');
         $this->type = $type;
     }
 
     /**
-     * Return repository
-     *
-     * @return Repository
+     * @return string
      */
-    public function getRepository(): Repository {
+    public function __toString(): string {
+        return implode(',', self::$countries);
+    }
 
-        return $this->repository;
+    // Static methods:
+
+    /**
+     * Get yesterday date
+     *
+     * @return string
+     */
+    public static function getYesterday(): string {
+        return date('Y-m-d', strtotime("-1 days"));
     }
 
     /**
-     * Set repository
+     * Get current date
      *
-     * @param Repository $repository
-     *
-     * @return MyClass
+     * @return string
      */
-    public function setRepository(Repository $repository): self {
-        $this->repository = $repository;
-
-        return $this;
+    public static function getNow(): string {
+        return date('Y-m-d');
     }
+
+    /**
+     * Get tomorrow date
+     *
+     * @return string
+     */
+    private static function getTomorrow(): string {
+        return date('Y-m-d', strtotime("+1 days"));
+    }
+
+    // Class methods (public, protected, private)
 
     /**
      * This is execute method description
      *
-     * @see http://link_to_documentation/example
+     * @param \Foo\Bar\This\Is\Some\Exmaple\Foo $foo
+     * @param \Foo\Bar\This\Is\Some\Exmaple\Bar $bar
+     * @param int|null $amount
      *
-     * @param string $foo
-     * @param string $bar
-     * @param int $amount
+     * @throws \Domain\Repository\Exception\NotFoundException
+     * @throws \Domain\Repository\Exception\AccountLimitException
      *
-     * @throws \Domain\Repository\Exception\NotFound
-     * @throws \Domain\Repository\Exception\AccountLimit
-     *
-     * @return bool
+     * @return string
      */
-    public function execute(string $foo, string $bar, int $amount): bool {
+    public function execute(\Foo\Bar\This\Is\Some\Exmaple\Foo $foo, \Foo\Bar\This\Is\Some\Exmaple\Bar $bar, int $amount = null): string {
+        $simpleArrayWithCountries = ['Poland','Denmark'];
 
-        // More than two keys.
+        // Array with more than two keys.
         $options = [
             'foo' => $foo,
             'bar' => $bar,
-            'amount' => $amount
+            'amount' => $amount,
+            'countries' => $simpleArrayWithCountries
         ];
-        $result = $this->getRepository()->checkSomething($options);
+
+        $image = $this->setSomethingUsingChaining(
+            [
+                $amount,
+                self::$strategies,
+                \Foo\Bar\Domain\Value\Image::$extensions
+            ],
+            \Foo\Bar\Test::THIS_IS_TEST,
+            $this->getType()
+        );
+        $result = $this->getRepository()->checkSomething($image, $options);
 
         return $result->getStatus ? self::STATUS_ACCEPTED : self::STATUS_FAILED;
     }
@@ -102,124 +189,162 @@ class MyClass extends AbstractAdapter implements AdapterInterface, PriceInterfac
      *
      * @param string $foo
      * @param string $bar
-     * @param Config $config
+     * @param \Foo\Bar\Config $config
      * @param string $name
      * @param string $type
      * @param string $status
      * @param int $amount
      *
-     * @throws \Domain\Repository\Exception\NotFound
-     * @throws \Domain\Repository\Exception\AccountLimit
-     * @throws \Domain\Value\Exception\Image\CanBeSaved
+     * @throws \Foo\Bar\Domain\Repository\Exception\NotFoundException
+     * @throws \Foo\Bar\Domain\Repository\Exception\AccountLimitException
+     * @throws \Foo\Bar\Domain\Value\Exception\Image\CanBeSavedException
      * @throws \Exception
      *
      * @return bool
      */
-    public function doSomethingWithManyParameters(
+    protected function doSomethingWithManyParameters(
         string $foo,
         string $bar,
-        Config $config,
+        \Foo\Bar\Config $config,
         string $name,
         string $type,
-        string $status,
+        string $strategyName,
         int $amount
     ): bool {
 
-        // This is simple comment.
-        if ($config->hasParameter('foo') === $foo) {
-
-            return $status;
+        // Very long if statement.
+        if (
+            $foo === 'test'
+            && $bar === 'superTest'
+            && (
+                $name === 'Bob'
+                || $type === self::getType()
+                || (
+                    $amount >= 10
+                    && $amount < 100
+                )
+                || in_array($strategyName, self::$strategies)
+            )
+        ) {
+            return STATUS_ACCEPTED;
+        }else{
+            return STATUS_FAILED;
         }
-
-        switch ($type) {
-            case 'basic':
-            case 'default':
-                $name = \Tools::generateCorrectName($bar); break;
-            default:
-                $name = \Tools::generateCorrectName($name);
-        }
-
-        try{
-            $result = $this->repository->countSomething($name, $type);
-        }catch(\Domain\Repository\Exception\Count $e){
-            $this->logger->info('Repo can\'t count something important', ['name' => $name, 'type' => $type]);
-            $result = 0;
-        }
-
-        return $amount < $result;
-    }
-
-    /**
-     * Set something
-     *
-     * @param string $foo
-     * @param string $bar
-     * @param string $rad
-     * @param string $fad
-     *
-     * @return Image
-     */
-    public function setSomethingUsingChaining(string $foo, string $bar, string $rad, string $fad): Image {
-        $this->image
-            ->setFoo($foo)
-            ->setBar($bar)
-            ->setRad($rad)
-            ->setFad($fad)
-            ->setStatuses([self::STATUS_FAILED, self::STATUS_ACCEPTED])
-        ;
-
-        return $this->image;
     }
 
     /**
      * Loop something
      *
+     * @param string $type
      * @param int|null $limit
      *
-     * @return array
+     * @return bool
      */
-    public function loopSomething(int $limit = null){
-        if ($limit === null) {
-            $limit = $this->getRepository()->countLimit();
-        }
-
+    public function loopSomething(string $type, int $limit = null): bool {
         $result = [];
         for ($i=0; $i<$limit; $i++) {
             $result[$i] = $this->getRepository()->doSomething($i);
         }
 
-        return $result;
+        switch ($type) {
+            case 'A' :
+                $name = 'Algeria';
+                break;
+            case 'B' :
+                $name = 'Belgium';
+                break;
+            case 'C' :
+                $name = 'Czech Republic';
+                break;
+            default:
+                $name = 'Poland';
+        }
+
+        return in_array($name, $result);
     }
 
     /**
-     * Method description
-     *
-     * Here's an example of how to format examples:
-     * <code>
-     *
-     * $this->>callSomething([
-     *  'test' => 'Test',
-     *  'test2' => 'Test2'
-     *  'test3' => 'Test3'
-     * ]);
-     *
-     * </code>
-     *
-     * Here is an example for non-php example or sample:
-     * <samp>
-     *
-     *   pear install net_sample
-     *
-     * </samp>
+     * Set something
      *
      * @param array $options
+     * @param string $bar
+     * @param string $rad
+     * @param string|null $fad
      *
-     * @return null|string
+     * @return Image
      */
-    public function callSomething(array $options): ?string {
-        $options['type'] = self::TYPE;
+    private function setSomethingUsingChaining(array $options, string $bar, string $rad, string $fad = null): Image {
 
-        return parent::callSomething($options);
+        // We can chain the methods until we have the same object on response.
+        return $this->image
+            ->setOptions($options)
+            ->setBar($bar)
+            ->setRad($rad)
+            ->setFad($fad)
+            ->setStatuses([self::STATUS_FAILED, self::STATUS_ACCEPTED]);
     }
 
+    // Setters and getters
+
+    /**
+     * @param string $type
+     *
+     * @return MyClass
+     */
+    public function setType(string $type): self {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Return type
+     *
+     * @return string
+     */
+    public function getType(): ?string {
+        return $this->type;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return MyClass
+     */
+    public function setName(string $name): self {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Return name
+     *
+     * @return string
+     */
+    public function getName(): ?string {
+        return $this->name;
+    }
+
+    /**
+     * Return repository
+     *
+     * @return \Foo\Bar\Domain\Repository
+     */
+    public function getRepository(): ?\Foo\Bar\Domain\Repository {
+        return $this->repository;
+    }
+
+    /**
+     * Set repository
+     *
+     * @param \Foo\Bar\Domain\Repository $repository
+     *
+     * @return MyClass
+     */
+    public function setRepository(\Foo\Bar\Domain\Repository $repository): self {
+        $this->repository = $repository;
+
+        return $this;
+    }
 }
