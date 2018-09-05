@@ -132,7 +132,7 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      *
      * @return string
      */
-    public static function getNow(): string {
+    protected static function getNow(): string {
         return date('Y-m-d');
     }
 
@@ -185,6 +185,37 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
     }
 
     /**
+     * Loop something
+     *
+     * @param string $type
+     * @param int|null $limit
+     *
+     * @return bool
+     */
+    public function loopSomething(string $type, int $limit = null): bool {
+        $result = [];
+        for ($i=0; $i<$limit; $i++) {
+            $result[$i] = $this->getRepository()->doSomething($i);
+        }
+
+        switch ($type) {
+            case 'A' :
+                $name = 'Algeria';
+                break;
+            case 'B' :
+                $name = 'Belgium';
+                break;
+            case 'C' :
+                $name = 'Czech Republic';
+                break;
+            default:
+                $name = 'Poland';
+        }
+
+        return in_array($name, $result);
+    }
+
+    /**
      * This is doSomethingWithManyParameters method description
      *
      * @param string $foo
@@ -230,37 +261,6 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
         }else{
             return STATUS_FAILED;
         }
-    }
-
-    /**
-     * Loop something
-     *
-     * @param string $type
-     * @param int|null $limit
-     *
-     * @return bool
-     */
-    public function loopSomething(string $type, int $limit = null): bool {
-        $result = [];
-        for ($i=0; $i<$limit; $i++) {
-            $result[$i] = $this->getRepository()->doSomething($i);
-        }
-
-        switch ($type) {
-            case 'A' :
-                $name = 'Algeria';
-                break;
-            case 'B' :
-                $name = 'Belgium';
-                break;
-            case 'C' :
-                $name = 'Czech Republic';
-                break;
-            default:
-                $name = 'Poland';
-        }
-
-        return in_array($name, $result);
     }
 
     /**
