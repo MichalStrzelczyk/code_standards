@@ -8,40 +8,65 @@ namespace Foo\Bar\Name;
  *
  * This is class description
  */
-class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
+abstract class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
     \Foo\Bar\Name\AdapterInterface,
     \Foo\Bar\Name\PriceInterface,
     \Foo\Bar\Name\MemoryInterface,
     \Foo\Bar\Name\ABCInterface {
 
-    // Traits:
+// Traits:
 
     use \Foo\Bar\Name\PriceTrait;
     use \Foo\Bar\Name\TransformTrait;
 
-    // Constants:
+// Constants:
 
+    /**
+     * This is comment
+     */
     public const STATUS_ACCEPTED = 'accepted';
+
+    /**
+     * This is comment
+     */
     protected const STATUS_FAILED = 'failed';
+
+    /**
+     * This is comment
+     */
     private const TYPE = 'internal';
 
+// Static properties:
 
-    // Static properties:
-
-    public static $countries = [
+    /**
+     * List of all countries
+     *
+     * @var array
+     */
+    static public $countries = [
         'pl' => 'Poland',
         'dk' => 'Denmark'
     ];
 
-    protected static $helpers = [
+    /**
+     * List of all helpers
+     *
+     * @var array
+     */
+    static protected  $helpers = [
         \Foo\Bar\Name\Helper\HelperA::class,
         \Foo\Bar\Name\Helper\HelperB::class,
         \Foo\Bar\Name\Helper\HelperC::class,
     ];
 
-    private static $strategies = ['First', 'Second'];
+    /**
+     * List of all strategies
+     *
+     * @var array
+     */
+    static private $strategies = ['First', 'Second'];
 
-    // Properties:
+// Properties:
 
     /**
      * @var string|null
@@ -63,7 +88,7 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      */
     private $image;
 
-    // Abstract static methods:
+// Abstract static methods:
 
     /**
      * Return class version
@@ -72,11 +97,9 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      *
      * @return string
      */
-    public static function getVersion(): string {
-        return '0.0.1';
-    }
+    abstract static public function getVersion(): string;
 
-    // Abstract methods:
+// Abstract methods:
 
     /**
      * Return Adapter
@@ -85,18 +108,9 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      *
      * @return \Foo\Bar\Name\Adapter\BasicInterface
      */
-    public function getAdapter(): \Foo\Bar\Name\Adapter\BasicInterface {
-        if (!is_null($this->adapter)) {
-            return $this->adapter;
-        }
+    abstract public function getAdapter(): \Foo\Bar\Name\Adapter\BasicInterface;
 
-        $this->adapter = \Foo\Bar\Name\AdapterFactory::create('\Adapter\\'.$this->getType());
-
-        return $this->adapter;
-    }
-
-
-    // Magic methods:
+// Magic methods:
 
     /**
      * MyClass constructor.
@@ -113,18 +127,18 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      * @return string
      */
     public function __toString(): string {
-        return implode(',', self::$countries);
+        return \implode(',', self::$countries);
     }
 
-    // Static methods:
+// Static methods:
 
     /**
      * Get yesterday date
      *
      * @return string
      */
-    public static function getYesterday(): string {
-        return date('Y-m-d', strtotime("-1 days"));
+    static public function getYesterday(): string {
+        return \date('Y-m-d', \strtotime("-1 days"));
     }
 
     /**
@@ -132,8 +146,8 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      *
      * @return string
      */
-    protected static function getNow(): string {
-        return date('Y-m-d');
+    static protected function getNow(): string {
+        return \date('Y-m-d');
     }
 
     /**
@@ -141,11 +155,11 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      *
      * @return string
      */
-    private static function getTomorrow(): string {
-        return date('Y-m-d', strtotime("+1 days"));
+    static private function getTomorrow(): string {
+        return \date('Y-m-d', \strtotime("+1 days"));
     }
 
-    // Class methods (public, protected, private)
+// Class methods (public, protected, private)
 
     /**
      * This is execute method description
@@ -212,7 +226,7 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
                 $name = 'Poland';
         }
 
-        return in_array($name, $result);
+        return \in_array($name, $result);
     }
 
     /**
@@ -254,11 +268,11 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
                     $amount >= 10
                     && $amount < 100
                 )
-                || in_array($strategyName, self::$strategies)
+                || \in_array($strategyName, self::$strategies)
             )
         ) {
             return STATUS_ACCEPTED;
-        }else{
+        } else {
             return STATUS_FAILED;
         }
     }
@@ -271,9 +285,9 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
      * @param string $rad
      * @param string|null $fad
      *
-     * @return Image
+     * @return \This\Is\Image
      */
-    private function setSomethingUsingChaining(array $options, string $bar, string $rad, string $fad = null): Image {
+    private function setSomethingUsingChaining(array $options, string $bar, string $rad, string $fad = null): \This\Is\Image {
 
         // We can chain the methods until we have the same object on response.
         return $this->image
@@ -284,7 +298,7 @@ class MyClass extends \Foo\Bar\Name\AbstractAdapter implements
             ->setStatuses([self::STATUS_FAILED, self::STATUS_ACCEPTED]);
     }
 
-    // Setters and getters
+// Setters and getters
 
     /**
      * @param string $type
